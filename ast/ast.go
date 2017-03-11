@@ -82,3 +82,15 @@ func (es ExpressionStatement) TokenLiteral() string { return es.Token.Literal }
 func (es ExpressionStatement) Useful() string {
 	return fmt.Sprintf("ast.ExpressionStatement -> Token=%s, Expression=%s", es.Token.Useful(), "NI")
 }
+
+// Integer Literal
+type IntegerLiteral struct {
+	Token token.Token
+	Value int64
+}
+
+func (il IntegerLiteral) expressionNode()      {}
+func (il IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
+func (il IntegerLiteral) Useful() string {
+	return fmt.Sprintf("ast.IntegerLiteral -> Token=%s Value=%d", il.Token.Useful(), il.Value)
+}

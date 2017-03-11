@@ -2,10 +2,27 @@ package parser
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/vishen/go-monkeylang/ast"
 	"github.com/vishen/go-monkeylang/lexer"
 	"github.com/vishen/go-monkeylang/token"
+)
+
+// Operator precedence for prefix and infix operators
+const (
+	_ int = iota
+	LOWEST
+
+	// Infix Operators
+	EQUALS      // ==
+	LESSGREATER // > or <
+	SUM         // +
+	PRODUCT     // *
+
+	// Prefix operators
+	PREFIX // -X or !X
+	CALL   // myFunction(X)
 )
 
 type prefixParseFunc func() ast.Expression
@@ -25,9 +42,16 @@ type Parser struct {
 
 func NewParser(l *lexer.Lexer) *Parser {
 	p := &Parser{l: l, errors: []string{}}
+
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()
 	p.nextToken()
+
+	// Register the prefix functions
+	p.prefixParseFuncs = make(map[token.TokenType]prefixParseFunc)
+	p.registerPrefixFunc(token.IDENT, p.parseIdentifier)
+	p.registerPrefixFunc(token.INT, p.parseIntegerLiteral)
+
 	return p
 }
 
@@ -68,8 +92,53 @@ func (p *Parser) parseStatement() ast.Statement {
 	case token.RETURN:
 		return p.parseReturnStatement()
 	default:
+		return p.parseExpressionStatement()
+	}
+}
+
+func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+	stmt := &ast.ExpressionStatement{Token: p.curToken}
+
+	stmt.Expression = p.parseExpression(LOWEST)
+
+	// Allow optional semicolon
+	// TODO(): Do I want this?? Should this raise an error?
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+// `prec` is for precedence
+func (p *Parser) parseExpression(prec int) ast.Expression {
+	prefix := p.prefixParseFuncs[p.curToken.Type]
+	if prefix == nil {
 		return nil
 	}
+
+	leftExp := prefix()
+
+	return leftExp
+}
+
+func (p *Parser) parseIntegerLiteral() ast.Expression {
+	lit := &ast.IntegerLiteral{Token: p.curToken}
+
+	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
+	if err != nil {
+		msg := fmt.Sprintf("could not parse %q as integer", p.curToken.Literal)
+		p.errors = append(p.errors, msg)
+		return nil
+	}
+
+	lit.Value = value
+
+	return lit
+}
+
+func (p *Parser) parseIdentifier() ast.Expression {
+	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {

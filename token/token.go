@@ -17,9 +17,11 @@ func (t Token) Useful() string {
 const (
 	ILLEGAL = "ILLEGAL"
 	EOF     = "EOF"
+
 	// Identifiers + literals
 	IDENT = "IDENT" // add, foobar, x, y, ...
 	INT   = "INT"   // 1343456
+
 	// Operators
 	ASSIGN   = "="
 	PLUS     = "+"
@@ -29,6 +31,7 @@ const (
 	SLASH    = "/"
 	LT       = "<"
 	GT       = ">"
+
 	// Delimiters
 	COMMA     = ","
 	SEMICOLON = ";"
@@ -36,6 +39,7 @@ const (
 	RPAREN    = ")"
 	LBRACE    = "{"
 	RBRACE    = "}"
+
 	// Keywords
 	FUNCTION = "FUNCTION"
 	LET      = "LET"
@@ -44,6 +48,7 @@ const (
 	IF       = "IF"
 	ELSE     = "ELSE"
 	RETURN   = "RETURN"
+
 	// Binary Comparision
 	EQUALS     = "=="
 	NOT_EQUALS = "!"
