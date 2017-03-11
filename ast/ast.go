@@ -94,3 +94,17 @@ func (il IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
 func (il IntegerLiteral) Useful() string {
 	return fmt.Sprintf("ast.IntegerLiteral -> Token=%s Value=%d", il.Token.Useful(), il.Value)
 }
+
+// Prefix Expression
+type PrefixExpression struct {
+	Token    token.Token // Prefix token; !, -
+	Operator string
+	Right    Expression
+}
+
+func (pe PrefixExpression) expressionNode()      {}
+func (pe PrefixExpression) TokenLiteral() string { return pe.Token.Literal }
+func (pe PrefixExpression) Useful() string {
+	return fmt.Sprintf("ast.PrefixExpression -> Token=%s, Operator=%s, Right=%s",
+		pe.Token.Useful(), pe.Operator, "NI")
+}
