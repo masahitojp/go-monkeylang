@@ -2,6 +2,7 @@ package token
 
 type TokenType string
 
+// TODO(): Store the filename and line number on the token?
 type Token struct {
 	Type    TokenType
 	Literal string
