@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/vishen/go-monkeylang/eval"
 	"github.com/vishen/go-monkeylang/lexer"
 	"github.com/vishen/go-monkeylang/parser"
-	_ "github.com/vishen/go-monkeylang/token"
 )
 
 const PROMPT = ">> "
@@ -36,8 +36,15 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
+		io.WriteString(out, "[DEBUG] ")
 		io.WriteString(out, program.String())
 		io.WriteString(out, "\n")
+
+		evaluated := eval.Eval(program)
+		if evaluated != nil {
+			io.WriteString(out, evaluated.Inspect())
+			io.WriteString(out, "\n")
+		}
 	}
 }
 
